@@ -14,7 +14,7 @@ reg s x y = [s !! (yReg + y0) !! (xReg + x0)| x0 <- [0..2], y0 <- [0..2]]
           yReg = y - y `mod` 3
 
 toSudoku :: String -> [[[Int]]]
-toSudoku = map (map ((filter (0 /=) . singleton) . read) . words) . lines
+toSudoku = map (map (filter (0 /=) . singleton . read) . words) . lines
 
 fromSudoku :: [[[Int]]] -> String
 fromSudoku = unlines . map (unwords . map (show . head))
