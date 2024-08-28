@@ -80,7 +80,7 @@ main = do
     let fileName = head args
     fileExists <- doesFileExist fileName
     unless fileExists $ do
-        hPutStrLn stderr $ "File \"" ++ fileName ++ "\" does not exist"
+        hPutStrLn stderr $ "File does not exist: " ++ fileName
         exitFailure
 
     file <- readFile fileName
