@@ -21,12 +21,12 @@
  -}
 
 import Control.Monad
-import Control.Monad.Extra
 import Data.List
 import System.Directory
 import System.Environment
 import System.Exit
 import System.IO (hPutStrLn, stderr)
+import Text.Read
 
 
 col :: [[a]] -> Int -> [a]
@@ -41,21 +41,23 @@ reg s x y = [s !! (yReg + y0) !! (xReg + x0)| x0 <- [0..2], y0 <- [0..2]]
           yReg = y - y `mod` 3
 
 toSudoku :: String -> [[[Int]]]
-toSudoku = map (map (filter (0 /=) . singleton . read) . words) . lines
+toSudoku = map (map (maybe [] singleton . readMaybe) . words) . lines
 
 fromSudoku :: [[[Int]]] -> String
-fromSudoku = unlines . map (unwords . map (show . head))
+fromSudoku = unlines . map (unwords . map f)
+    where f [] = "."
+          f e  = show $ head e
 
 events :: [[[Int]]] -> [[[Int]]]
-events s = [[aux i j | i <- [0..8]] | j <- [0..8]]
-    where aux x y
+events s = [[f i j | i <- [0..8]] | j <- [0..8]]
+    where f x y
             | length e == 1 = e
             | otherwise = [1..9] \\ concat (col s x ++ row s y ++ reg s x y)
             where e = s !! y !! x
 
 solve :: [[[Int]]] -> [[[Int]]]
-solve s = [[aux i j | i <- [0..8]] | j <- [0..8]]
-    where aux x y
+solve s = [[f i j | i <- [0..8]] | j <- [0..8]]
+    where f x y
             | length e == 1 = e
             | otherwise = as `union` bs `union` cs
             where e = s !! y !! x
