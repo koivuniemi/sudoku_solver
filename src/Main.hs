@@ -75,14 +75,15 @@ main = do
         hPutStrLn stderr "No file specified"
         exitFailure
 
-    filesExist <- traverse doesFileExist args
-    whenJust (findIndex not filesExist) $ \i -> do
-        hPutStrLn stderr ("Couldn't find file: " ++ (args !! i))
+    let fileName = head args
+    fileExists <- doesFileExist fileName
+    unless fileExists $ do
+        hPutStrLn stderr $ "File \"" ++ fileName ++ "\" does not exist"
         exitFailure
 
-    files <- traverse readFile args
-    when (any checkFileFormat files) $ do
+    file <- readFile fileName
+    when (checkFileFormat file) $ do
         hPutStrLn stderr "Incorrect file format"
         exitFailure
 
-    mapM_ (putStrLn . fromSudoku . (!! 50) . iterate (solve . events) . toSudoku) files
+    putStrLn $ fromSudoku $ (!! 50) $ iterate (solve . events) $ toSudoku file
